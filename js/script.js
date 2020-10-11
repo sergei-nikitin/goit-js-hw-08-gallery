@@ -1,51 +1,80 @@
 import products from './gallery-items.js';
 
-const fotosList = document.querySelector('.gallery, .js-gallery');
+const galleryList = document.querySelector('.gallery');
 
 // Создание и рендер разметки по массиву данных 
 // и предоставленному шаблону.
-const fotosMakeList = products.reduce((acc, { preview, original, description }) => {
-    acc += `<li class="gallery__item">
-    <a class="gallery__link" href="${original}">
-    <img class="gallery__image"
-      src="${preview}"
-      data-source="${original}"
-      alt="${description}"/>
-      </a>
-      </li>`;
-    return acc;
-}, '')
-const fotoList = document.querySelector('.gallery');
-fotoList.insertAdjacentHTML('beforeend', fotosMakeList);
 
 
+// const createFotoMarkup = products.reduce((acc, { preview, original, description }) => {
+//   acc += `<li class="gallery__item">
+//     <a class="gallery__link" href="${original}">
+//     <img class="gallery__image"
+//       src="${preview}"
+//       data-source="${original}"
+//       alt="${description}"/>
+//       </a>
+//       </li>`;
+//   return acc;
+// }, '');
+// galleryList.insertAdjacentHTML('beforeend', createFotoMarkup);
 
+const createFotoMarkup = (options) => {
+  const { preview, original, description } = options;
+    return `<li class="gallery__item">
+  <a class="gallery__link"
+    href="${original}">
 
+  <img
+    src="${preview}" 
+    data-source="${original}"
+    alt="${description}" 
+    class="gallery__image">
+  </a>
+  </li>`;
+};
+const makeItemsGallery = products.map(createFotoMarkup).join(" ");
 
-// const createFotoMarkup = (options) => {
-//   const { preview, original, description } = options;
-//     return `<li class="gallery__item">
-//   <a class="gallery__link"
-//     href="${original}">
-
-//   <img
-//     src="${preview}" 
-//     data-source="${original}"
-//     alt="${description}" 
-//     class="gallery__image">
-//   </a>
-//   </li>`;
-// };
-// const makeItemsGallery = products.map(createFotoMarkup).join(" ");
-
-// fotosList.insertAdjacentHTML('beforeend', makeItemsGallery);
-
-
-// --------------------------------------------------
+galleryList.insertAdjacentHTML('beforeend', makeItemsGallery);
 
 // Реализация делегирования на галерее ul.js-gallery 
 // и получение url большого изображения.
 
-// fotosList.addEventListener('click', onFotoClick);
+galleryList.addEventListener('click', onFotoClick);
+const lightBox = document.querySelector('.lightbox');
+const lightBoxOverlay = document.querySelector('.lightbox__overlay');
+const ligthBoxImage = document.querySelector('.lightbox__image');
 
-// function onfotoClick(evt) { };
+// Открытие модального окна по клику на элементе галереи.
+function onFotoClick(evt) {
+  evt.preventDefault();
+  if (evt.target.nodeName !== 'IMG') {
+    return;
+  }
+  lightBox.classList.add('is-open');
+  // Подмена значения атрибута src элемента img.lightbox__image.
+  ligthBoxImage.src = evt.target.dataset.source;
+  ligthBoxImage.alt = evt.target.alt;
+
+  return evt.target.dataset.source;
+};
+
+
+const btnClose = document.querySelector('.lightbox__button');
+
+// Закрытие модального окна по клику 
+// на кнопку button[data - action= "close-lightbox"]
+btnClose.addEventListener('click', onCloseModal);
+// Закрытие модального окна по клику на div.lightbox__overlay
+lightBoxOverlay.addEventListener('click', onCloseModal);
+
+function onCloseModal(evt) {
+  if (evt.target.nodeName === 'IMG') {
+    return;
+  }
+  lightBox.classList.remove('is-open');
+
+// Очистка значения атрибута src элемента img.lightbox__image
+  ligthBoxImage.removeAttribute('src');
+  ligthBoxImage.removeAttribute('alt');
+}
